@@ -3,25 +3,24 @@
 ## Overview
 
 This repo provides:
-1. Streamable HTTP Server with OAuth 
-2. Streamable Client with OAuth
+1. A Streamable HTTP Server with with support OAuth (via device flow) 
+2. A Streamable HTTP Client with support for OAuth (in headless mode)
 
 
-## Server-to-Server OAuth 
+## OAuth Support
 
-At the time of writing this, I wasn't able to find a way to use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) to test a Streamable HTTP Server with OAuth. 
+At the time of writing this, I wasn't able to use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) to test a Streamable HTTP Server with OAuth. This set me down the path of implementing OAuth through device flow. 
 
-In a typical browser-based flow (say using the MCP Inspector), my understanding is that:
+In a typical browser-based flow (say using the MCP Inspector):
 1. MCP Client requests connection to MCP server.
-2. Server authorizes clients through GHAuthProvider (redirect to GitHub); once user authorizes the scope, Server's callback handler:
+2. Server authorizes clients through a GitHub AuthProvider (redirect to GitHub); once user authorizes the scope, Server's callback handler:
      a. Retrieves access token from GitHub, then retrieves user data
      b. Stores access token + new session token in its token store
-     c. Generates temp auth code for client, saves it with new session token
+     c. Generates temp auth code for client, saves it with newly generated session token
      d. Redirects back to client with temp auth code
 3. Client exchanges temp auth code for session token, uses for subsequent requests
-4. On reconnection, Server validates session via verifyAccessToken method
 
-I wanted to replace browser flow with device flow based OAuth. This would work as follows:
+I wanted to replace this browser flow based OAuth flow with device flow based OAuth. This would work as follows:
 
 Client                          Server                          GitHub
      |                               |                               |
@@ -38,15 +37,15 @@ Client                          Server                          GitHub
      |<-- MCP session token ---------|                               |
 
 
-In device flow, we don't need PKCE because:
+In device flow based OAuth, we don't need PKCE because:
 1. There's no redirect or client-side code handling.
 2. The device code flow is inherently more secure because:
-	- User enters code on GitHub's site directly
+	- User opens the URL and enters code on GitHub's page directly
 	- All token exchange happens server-to-server
 	- The device code itself is short-lived and can only be used by the same client that requested it (our server)
 	- Only the user code is passed down from the server to the client
 
-However, we won't have the browser for session storage and may need to store data on the local file system. And we may need to implement certain methods of that the MCP's OAuthServerProvider currently requires (e.g. exchangeAuthorizationCode and challengeForAuthorizationCode)
+However, we also don't have the browser for session storage. We may still need to implement certain methods of that the MCP's OAuthServerProvider currently requires (e.g. exchangeAuthorizationCode and challengeForAuthorizationCode).
 
 ## How to use
 

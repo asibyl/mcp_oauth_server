@@ -42,15 +42,17 @@ However, we also don't have the browser for session storage. We may still need t
 npm install
 ```
 
-2. Set the GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables.
+2. Go to your Developer Settings on GitHub (under Settings) and create an OAuth app. Enter "http://localhost for callback URL if needed. Be sure to select 'Enable Device Flow'. Note the Client ID and Client Secret.
+   
+3. Set the GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables in your local dev environment. 
 
-3. Start the MCP Server.
+4. Start the MCP Server.
 
 ```
 npx tsx server/index_streamable.ts
 ```
 
-4. In a different terminal, start the MCP Client. 
+5. In a different terminal, start the MCP Client. 
 
 ```
 npx tsx client/client.ts
